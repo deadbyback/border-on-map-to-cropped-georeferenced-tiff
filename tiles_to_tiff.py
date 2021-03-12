@@ -15,7 +15,7 @@ from osgeo import ogr
 tile_server = "https://a.tile.openstreetmap.org/{z}/{x}/{y}.png"
 temp_dir = os.path.join(os.path.dirname(__file__), 'temp')
 output_dir = os.path.join(os.path.dirname(__file__), 'output')
-zoom = 18
+zoom = 17
 lon_min = 32.0644341554349
 lon_max = 32.0744341554349
 lat_min = 49.7466314987413
@@ -43,7 +43,6 @@ def merge_tiles(input_pattern, output_path):
 
     for name in glob.glob(input_pattern):
         merge_command.append(name)
-    print(f"{merge_command}")
     subprocess.call(merge_command, shell=True)
 
 
@@ -76,7 +75,6 @@ def crop_raster_by_wkt_polygon(raster,polygon_wkt,output_path):
     geom = ogr.CreateGeometryFromWkt(polygon_wkt)
     extent_json = geom.GetBoundary().ExportToJson()
     extent = json_polygon_to_extent(extent_json)
-    print(extent)
     output_raster = gdal.Warp(output_path,
               raster,
               format = 'GTiff',
@@ -113,14 +111,20 @@ for x in range(x_min, x_max + 1):
             continue
 
 print("Download complete")
+try: 
+    print("Merging tiles")
+    merge_tiles(temp_dir + '/*.tif', output_dir + '/merged.tif')
+    print("Merge complete")
 
-print("Merging tiles")
-merge_tiles(temp_dir + '/*.tif', output_dir + '/merged.tif')
-print("Merge complete")
-
-shutil.rmtree(temp_dir)
-os.makedirs(temp_dir)
-print("Temporary folder cleaned")
+    shutil.rmtree(temp_dir)
+    os.makedirs(temp_dir)
+    print("Temporary folder cleaned")
+except:
+    print("Merge is not completed!")
+    shutil.rmtree(temp_dir)
+    os.makedirs(temp_dir)
+    print("Temporary folder cleaned")
+    sys.exit()
 
 mergedRaster = gdal.Open(output_dir + '/merged.tif')
 wktPolygon = 'POLYGON ((%s %s,%s %s,%s %s,%s %s,%s %s))' % (
@@ -131,5 +135,8 @@ wktPolygon = 'POLYGON ((%s %s,%s %s,%s %s,%s %s,%s %s))' % (
         lon_min,lat_min)
 output_path = output_dir + '/result.tif'
 
-mergedRaster = crop_raster_by_wkt_polygon(mergedRaster,wktPolygon,output_path)
-print(mergedRaster)
+try:
+    mergedRaster = crop_raster_by_wkt_polygon(mergedRaster,wktPolygon,output_path)
+except:
+    print('Crop is failed!')
+    sys.exit()
