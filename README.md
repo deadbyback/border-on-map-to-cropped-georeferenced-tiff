@@ -1,6 +1,9 @@
 # border-on-map-to-cropped-georeferenced-tiff
 Python script for converting XYZ raster tiles for slippy maps to a georeferenced TIFF image. 
 
+## Special thanks
+The repository was based on https://github.com/jimutt/tiles-to-tiff. 
+
 ## Prerequisites:
 - GDAL
 - Empty "output" and "temp" folders in project directory. 
