@@ -6,20 +6,38 @@ import subprocess
 import shutil
 import sys
 import json
+import argparse
 from tile_convert import bbox_to_xyz, tile_edges
 from osgeo import gdal
 from osgeo import ogr
 
-#---------- CONFIGURATION -----------#
+#--------- INITIALIZATION ----------#
+parser = argparse.ArgumentParser()
+parser.add_argument("-lat_min", "--lat_min", type=float, help = "Minimum latitude")
+parser.add_argument("-lat_max", "--lat_max", type=float, help = "Maximum latitude")
+parser.add_argument("-lng_min", "--lng_min", type=float, help = "Minimum longitude")
+parser.add_argument("-lng_max", "--lng_max", type=float, help = "Maximum longitude")
+parser.add_argument("-z", "--zoom", type=float, help = "Zoom level")
 
+args = parser.parse_args()
+print (args)
+lat_min = args.lat_min
+lat_max = args.lat_max
+lon_min = args.lng_min
+lon_max = args.lng_max
+zoom = round(args.zoom)
+    # python tiles_to_tiff.py -lat_min=49.7466314987413 -lat_max=49.7566314987413 -lng_min=32.0644341554349 -lng_max=32.0844341554349 -z=17
+#-----------------------------------#
+
+#---------- CONFIGURATION ----------#
 tile_server = "https://a.tile.openstreetmap.org/{z}/{x}/{y}.png"
 temp_dir = os.path.join(os.path.dirname(__file__), 'temp')
 output_dir = os.path.join(os.path.dirname(__file__), 'output')
-zoom = 17
-lon_min = 32.0644341554349
-lon_max = 32.0744341554349
-lat_min = 49.7466314987413
-lat_max = 49.7666314987413
+# zoom = 17
+# lon_min = 32.0644341554349
+# lon_max = 32.0844341554349
+# lat_min = 49.7466314987413
+# lat_max = 49.7566314987413
 #-----------------------------------#
 
 #----------- FUNCTIONS -------------#
@@ -109,8 +127,12 @@ for x in range(x_min, x_max + 1):
             georeference_raster_tile(x, y, zoom, png_path)
         except:
             continue
+if os.listdir(temp_dir):
+    print("Download complete")
+else:
+    print("Temporary folder is empty!")
+    sys.exit()
 
-print("Download complete")
 try: 
     print("Merging tiles")
     merge_tiles(temp_dir + '/*.tif', output_dir + '/merged.tif')
@@ -137,6 +159,25 @@ output_path = output_dir + '/result.tif'
 
 try:
     mergedRaster = crop_raster_by_wkt_polygon(mergedRaster,wktPolygon,output_path)
+
+    options_list = [
+    '-ot Byte',
+    '-of GTiff',
+    #'-b 1',
+    #'-scale'
+    ]           
+    options_string = " ".join(options_list)
+    output_filename, extension = os.path.splitext(output_path)
+        
+    gdal.Translate(
+        output_filename + '.jpg',
+        output_path,
+        rgbExpand = 'RGB',
+        options=options_string
+    )
 except:
     print('Crop is failed!')
     sys.exit()
+finally:
+    os.remove(output_dir + '/merged.tif')
+    print("All temp files are removed")
