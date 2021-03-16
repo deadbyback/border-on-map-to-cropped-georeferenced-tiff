@@ -1,5 +1,7 @@
 # border-on-map-to-cropped-georeferenced-tiff
 
+[![CodeQL](https://github.com/deadbyback/border-on-map-to-cropped-georeferenced-tiff/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/deadbyback/border-on-map-to-cropped-georeferenced-tiff/actions/workflows/codeql-analysis.yml)
+
 Python script for converting XYZ raster tiles for slippy maps to a georeferenced TIFF image.
 
 ## Special thanks
