@@ -18,6 +18,8 @@ parser.add_argument("-lat_max", "--lat_max", type=float, help = "Maximum latitud
 parser.add_argument("-lng_min", "--lng_min", type=float, help = "Minimum longitude")
 parser.add_argument("-lng_max", "--lng_max", type=float, help = "Maximum longitude")
 parser.add_argument("-z", "--zoom", type=float, help = "Zoom level")
+parser.add_argument("-wth", "--width", type=float, help = "Width")
+parser.add_argument("-hgt", "--height", type=float, help = "Height")
 
 args = parser.parse_args()
 print (args)
@@ -26,6 +28,8 @@ lat_max = args.lat_max
 lon_min = args.lng_min
 lon_max = args.lng_max
 zoom = round(args.zoom)
+width = args.width
+height = args.height
     # python tiles_to_tiff.py -lat_min=49.7466314987413 -lat_max=49.7566314987413 -lng_min=32.0644341554349 -lng_max=32.0844341554349 -z=17
 #-----------------------------------#
 
@@ -101,6 +105,8 @@ def crop_raster_by_wkt_polygon(raster,polygon_wkt,output_path):
               outputBoundsSRS='EPSG:4326',
               cutlineLayer = 'extent_json',
               cropToCutline=True,
+              width=width,
+              height=height,
               dstNodata = 0)
     return output_raster
     

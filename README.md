@@ -16,6 +16,7 @@ The repository was based on <https://github.com/jimutt/tiles-to-tiff>.
 ## Usage
 
 - Modify configuration in `tiles_to_tiff.py` according to personal preferences.
-- Run script with `$ python tiles_to_tiff.py -lat_min={number} -lat_max={number} -lng_min={number} -lng_max={number} -z={number}`
+- Run script with `$ python tiles_to_tiff.py -lat_min={number} -lat_max={number} -lng_min={number} -lng_max={number} -z={number} -wth={number} -hgt={number}`
+or another way `$ python tiles_to_tiff.py --lat_min={number} --lat_max={number} --lng_min={number} --lng_max={number} --zoom={number} --width={number} -height={number}`
 
 Be careful with zoom value
